@@ -47,8 +47,7 @@ public class Buffer {
 	  
 	public void updateIndex() {
 		m_bufferIndex = (++m_bufferIndex)%BUFFERNUM;
-	    System.out.print("m_bufferIndex = %d");
-	    System.out.println(m_bufferIndex);
+	    //System.out.println("m_bufferIndex = " + m_bufferIndex);
 	}
 	  
 	public float[] genBufferForFFT(int startIndex, int axis) {

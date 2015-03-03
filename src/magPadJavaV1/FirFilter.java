@@ -44,7 +44,7 @@ public class FirFilter {
 	private double[] loadCoefficients(String fileName) {
 		List<String> lines = null;
 		try {
-			lines = Files.readAllLines(Paths.get("src/magPadJavaV1", fileName), StandardCharsets.UTF_8);
+			lines = Files.readAllLines(Paths.get("files", fileName), StandardCharsets.UTF_8);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

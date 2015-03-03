@@ -10,5 +10,14 @@
 	<classpathentry kind="lib" path="mp3spi1.9.4.jar"/>
 	<classpathentry kind="lib" path="tritonus_aos.jar"/>
 	<classpathentry kind="lib" path="tritonus_share.jar"/>
+	<classpathentry kind="lib" path="encog-engine-2.5.0.jar"/>
+	<classpathentry kind="lib" path="neuroph-adapters-2.9.jar"/>
+	<classpathentry kind="lib" path="neuroph-contrib-2.9.jar"/>
+	<classpathentry kind="lib" path="neuroph-core-2.9.jar"/>
+	<classpathentry kind="lib" path="neuroph-imgrec-2.9.jar"/>
+	<classpathentry kind="lib" path="neuroph-ocr-2.9.jar"/>
+	<classpathentry kind="lib" path="neuroph-samples-2.9.jar"/>
+	<classpathentry kind="lib" path="slf4j-api-1.7.5.jar"/>
+	<classpathentry kind="lib" path="slf4j-nop-1.7.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

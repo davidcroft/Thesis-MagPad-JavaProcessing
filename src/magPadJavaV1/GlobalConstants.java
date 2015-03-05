@@ -17,6 +17,6 @@ public class GlobalConstants {
 	public static final int TRAININGPOSNUM = 6;	// number of positions for training
 	public static final int NNINPUTNUM = 12;
 	public static final int NNOUTPUTNUM = 1;
-	public static DataSet trainingSet = new DataSet(NNINPUTNUM*3, NNOUTPUTNUM);
-	public static DataSet testingSet = new DataSet(NNINPUTNUM*3, NNOUTPUTNUM);
+	public static DataSet trainingSet = new DataSet(NNINPUTNUM, NNOUTPUTNUM);
+	public static DataSet testingSet = new DataSet(NNINPUTNUM, NNOUTPUTNUM);
 }

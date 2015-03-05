@@ -37,13 +37,14 @@ public class MultiLayerPerceptronNN {
 			List<Integer> list = new ArrayList<>();
 			list.add(inputNum);
 			list.add(middleNum);
+			list.add(6);
 			list.add(outputNum);
 			myMlPerceptron = new MultiLayerPerceptron(list, TransferFunctionType.SIGMOID);
 			//myMlPerceptron.getLearningRule().setNeuralNetwork(nnet);
 			BackPropagation learningRule = new BackPropagation();
 			learningRule.setLearningRate(0.3);
-			learningRule.setMaxError(0.0001);
-			learningRule.setMaxIterations(30000);
+			learningRule.setMaxError(0.00001);
+			learningRule.setMaxIterations(50000);
 			myMlPerceptron.setLearningRule(learningRule);
 			//myMlPerceptron.getLearningRule().setLearningRate(0.3);
 			//myMlPerceptron.getLearningRule().setMaxIterations(20000);
@@ -74,6 +75,9 @@ public class MultiLayerPerceptronNN {
 
 		// load saved neural network
 		nnet = NeuralNetwork.createFromFile(modelPath);
+		
+		// set isTrained
+		isTrained = true;
 
 		// test loaded neural network
 		System.out.println("Testing loaded neural network");

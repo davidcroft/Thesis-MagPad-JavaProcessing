@@ -44,22 +44,22 @@ public class FFTThread implements Runnable {
 		  
 		// init hashtable
 		ht = new HashMap<Integer, Float>();
-		/*ht.put(1, ((float)2/NORMTAGVAL));
+		ht.put(1, ((float)2/NORMTAGVAL));
 		ht.put(2, ((float)5/NORMTAGVAL));
 		ht.put(3, ((float)8/NORMTAGVAL));
 		ht.put(4, ((float)11/NORMTAGVAL));
 		ht.put(5, ((float)14/NORMTAGVAL));
 		ht.put(6, ((float)17/NORMTAGVAL));
 		ht.put(7, ((float)20/NORMTAGVAL));
-		ht.put(8, ((float)23/NORMTAGVAL));*/
+		ht.put(8, ((float)23/NORMTAGVAL));
 		  
-		ht.put(1, ((float)4/NORMTAGVAL));
+		/*ht.put(1, ((float)4/NORMTAGVAL));
 		ht.put(2, ((float)7/NORMTAGVAL));
 		ht.put(3, ((float)9/NORMTAGVAL));
 		ht.put(4, ((float)10/NORMTAGVAL));
 		ht.put(5, ((float)15/NORMTAGVAL));
 		ht.put(6, ((float)18/NORMTAGVAL));
-		ht.put(7, ((float)22/NORMTAGVAL));
+		ht.put(7, ((float)22/NORMTAGVAL));*/
 		  
 		  
 		// thread setting
@@ -116,18 +116,42 @@ public class FFTThread implements Runnable {
 		// append data to trainingSet
 		if (!m_isTrained) {
 			// add an item in trainingSet for model training
-			double[] rowInput = new double[GlobalConstants.NNINPUTNUM*3];
+			double[] rowInput = new double[GlobalConstants.NNINPUTNUM];
 			double[] rowOutput = new double[GlobalConstants.NNOUTPUTNUM];
 			  
 			int index = 0;
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftX.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftX.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftX.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftX.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftX.getBand(7)/NORMMAXVAL;
+				}
 			}
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftY.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftY.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftY.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftY.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftY.getBand(7)/NORMMAXVAL;
+				}
 			}
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftZ.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftZ.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftZ.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftZ.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftZ.getBand(7)/NORMMAXVAL;
+				}
 			}
 			rowOutput[0] = (double)ht.get(m_fftIndex);
 			// insert into training set 
@@ -155,17 +179,41 @@ public class FFTThread implements Runnable {
 				GlobalConstants.testingSet.clear();
 			}*/
 			// add an item in testingSet for predicting
-			double[] rowInput = new double[GlobalConstants.NNINPUTNUM*3];
+			double[] rowInput = new double[GlobalConstants.NNINPUTNUM];
 			double[] rowOutput = new double[GlobalConstants.NNOUTPUTNUM];
 			int index = 0;
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftX.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftX.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftX.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftX.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftX.getBand(7)/NORMMAXVAL;
+				}
 			}
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftY.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftY.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftY.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftY.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftY.getBand(7)/NORMMAXVAL;
+				}
 			}
-			for (int i = 0; i < GlobalConstants.NNINPUTNUM; i++) {
-				rowInput[index++] = (double)fftZ.getBand(i)/NORMMAXVAL;
+			for (int i = 0; i < 4; i++) {
+				if (i == 0) {
+					rowInput[index++] = (double)fftZ.getBand(3)/NORMMAXVAL;
+				} else if (i == 1) {
+					rowInput[index++] = (double)fftZ.getBand(4)/NORMMAXVAL;
+				} else if (i == 2) {
+					rowInput[index++] = (double)fftZ.getBand(6)/NORMMAXVAL;
+				} else if (i == 3) {
+					rowInput[index++] = (double)fftZ.getBand(7)/NORMMAXVAL;
+				}
 			}
 			rowOutput[0] = (double)0;
 			GlobalConstants.testingSet.addRow(rowInput, rowOutput);

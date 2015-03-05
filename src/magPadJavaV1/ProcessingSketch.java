@@ -58,12 +58,12 @@ public class ProcessingSketch extends PApplet {
 		firFilterTRZ = new FirFilter("FirFilterTR.fcf");
 		
 		// neural network
-		nnet = new MultiLayerPerceptronNN("myModel.nnet", GlobalConstants.NNINPUTNUM*3, 24, GlobalConstants.NNOUTPUTNUM);
+		nnet = new MultiLayerPerceptronNN("myModel.nnet", GlobalConstants.NNINPUTNUM, 18, GlobalConstants.NNOUTPUTNUM);
 		isTrained = nnet.getIsTrained();
 		System.out.println("isTrained = "+(isTrained?"true":"false"));
 		System.out.println("create a new neural network");
-		    
-	    size(800,800);
+
+	    size(800,600);
 	}
 
 	public void draw() {
@@ -129,7 +129,7 @@ public class ProcessingSketch extends PApplet {
 		    // predict
 		    if (!GlobalConstants.testingSet.isEmpty()) {
 		    	DataSetRow testDataRow = GlobalConstants.testingSet.getRowAt(0);
-		    	DataSet testSet = new DataSet(GlobalConstants.NNINPUTNUM*3, GlobalConstants.NNOUTPUTNUM);
+		    	DataSet testSet = new DataSet(GlobalConstants.NNINPUTNUM, GlobalConstants.NNOUTPUTNUM);
 		    	testSet.addRow(testDataRow);
 		    	GlobalConstants.testingSet.removeRowAt(0);
 		    	nnet.testNeuralNetwork(testSet);

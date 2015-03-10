@@ -33,6 +33,7 @@ public class ProcessingSketch extends PApplet {
 	// neural network
 	public MultiLayerPerceptronNN nnet;
 	private boolean isTrained = false;
+	public LocationRecognition locRecog;
 	
 
 	public void setup() {
@@ -62,6 +63,9 @@ public class ProcessingSketch extends PApplet {
 		isTrained = nnet.getIsTrained();
 		System.out.println("isTrained = "+(isTrained?"true":"false"));
 		System.out.println("create a new neural network");
+		
+		// location recognition
+		locRecog = new LocationRecognition(2);
 
 	    size(800,600);
 	}
@@ -132,7 +136,19 @@ public class ProcessingSketch extends PApplet {
 		    	DataSet testSet = new DataSet(GlobalConstants.NNINPUTNUM, GlobalConstants.NNOUTPUTNUM);
 		    	testSet.addRow(testDataRow);
 		    	GlobalConstants.testingSet.removeRowAt(0);
-		    	nnet.testNeuralNetwork(testSet);
+		    	double predictLoc = nnet.testNeuralNetwork(testSet);
+		    	// send to locationRecognition
+		    	//System.out.println("new prediction");
+		    	if (locRecog.addToRecog(predictLoc)) {
+		    		// robust location
+		    		double location = locRecog.getDetectLocation();
+		    		System.out.println("get a robust new location " + location);
+		    		
+		    		// send a OSC message
+		    		OscMessage myMessage = new OscMessage("/loc");
+		    		myMessage.add((float)location); 
+		    		oscP5.send(myMessage, remoteLocation); 
+		    	}
 		    }
 	    } else {
 		    // TRAINING

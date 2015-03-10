@@ -85,17 +85,27 @@ public class MultiLayerPerceptronNN {
 		
 	}
 
-	public void testNeuralNetwork(DataSet testSet) {
+	public double testNeuralNetwork(DataSet testSet) {
 		if (isTrained) {
 			//System.out.println("testNeuralNetwork");
-			for(DataSetRow dataRow : testSet.getRows()) {
+			/*for(DataSetRow dataRow : testSet.getRows()) {
 				nnet.setInput(dataRow.getInput());
 				nnet.calculate();
 				double[] networkOutput = nnet.getOutput();
 				//System.out.println("Input: " + Arrays.toString(dataRow.getInput()) );
 				//System.out.println(" Output: " + Arrays.toString(networkOutput));
 				System.out.println(" Output: " + networkOutput[0]*25);
-			}
+			}*/
+			
+			DataSetRow dataRow = testSet.getRowAt(0);
+			nnet.setInput(dataRow.getInput());
+			nnet.calculate();
+			double[] networkOutput = nnet.getOutput();
+			double result = networkOutput[0]*GlobalConstants.MAXWIDTH;
+			//System.out.println(" Output: " + result);
+			return result;
+		} else {
+			return -1;
 		}
 	}
 }

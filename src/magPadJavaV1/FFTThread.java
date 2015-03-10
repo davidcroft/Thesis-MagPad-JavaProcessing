@@ -44,14 +44,14 @@ public class FFTThread implements Runnable {
 		  
 		// init hashtable
 		ht = new HashMap<Integer, Float>();
-		ht.put(1, ((float)2/NORMTAGVAL));
+		/*ht.put(1, ((float)2/NORMTAGVAL));
 		ht.put(2, ((float)5/NORMTAGVAL));
 		ht.put(3, ((float)8/NORMTAGVAL));
 		ht.put(4, ((float)11/NORMTAGVAL));
 		ht.put(5, ((float)14/NORMTAGVAL));
 		ht.put(6, ((float)17/NORMTAGVAL));
 		ht.put(7, ((float)20/NORMTAGVAL));
-		ht.put(8, ((float)23/NORMTAGVAL));
+		ht.put(8, ((float)23/NORMTAGVAL));*/
 		  
 		/*ht.put(1, ((float)4/NORMTAGVAL));
 		ht.put(2, ((float)7/NORMTAGVAL));
@@ -60,6 +60,15 @@ public class FFTThread implements Runnable {
 		ht.put(5, ((float)15/NORMTAGVAL));
 		ht.put(6, ((float)18/NORMTAGVAL));
 		ht.put(7, ((float)22/NORMTAGVAL));*/
+		
+		ht.put(1, ((float)3/NORMTAGVAL));
+		ht.put(2, ((float)5/NORMTAGVAL));
+		ht.put(3, ((float)7/NORMTAGVAL));
+		ht.put(4, ((float)9/NORMTAGVAL));
+		ht.put(5, ((float)11/NORMTAGVAL));
+		ht.put(6, ((float)13/NORMTAGVAL));
+		ht.put(7, ((float)15/NORMTAGVAL));
+		ht.put(8, ((float)17/NORMTAGVAL));
 		  
 		  
 		// thread setting

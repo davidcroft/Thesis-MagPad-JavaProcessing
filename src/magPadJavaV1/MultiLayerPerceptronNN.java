@@ -12,7 +12,7 @@ import org.neuroph.nnet.MultiLayerPerceptron;
 import org.neuroph.nnet.learning.BackPropagation;
 import org.neuroph.util.TransferFunctionType;
 
-public class MultiLayerPerceptronNN { 
+public class MultiLayerPerceptronNN {
 	private static NeuralNetwork<BackPropagation> nnet = new NeuralNetwork<BackPropagation>();
 	private String modelPath;
 	private MultiLayerPerceptron myMlPerceptron;
@@ -37,14 +37,14 @@ public class MultiLayerPerceptronNN {
 			List<Integer> list = new ArrayList<>();
 			list.add(inputNum);
 			list.add(middleNum);
-			list.add(6);
+			//list.add(12);
 			list.add(outputNum);
 			myMlPerceptron = new MultiLayerPerceptron(list, TransferFunctionType.SIGMOID);
 			//myMlPerceptron.getLearningRule().setNeuralNetwork(nnet);
 			BackPropagation learningRule = new BackPropagation();
 			learningRule.setLearningRate(0.3);
-			learningRule.setMaxError(0.00001);
-			learningRule.setMaxIterations(50000);
+			learningRule.setMaxError(0.0001);
+			learningRule.setMaxIterations(500000);
 			myMlPerceptron.setLearningRule(learningRule);
 			//myMlPerceptron.getLearningRule().setLearningRate(0.3);
 			//myMlPerceptron.getLearningRule().setMaxIterations(20000);
@@ -85,7 +85,7 @@ public class MultiLayerPerceptronNN {
 		
 	}
 
-	public double testNeuralNetwork(DataSet testSet) {
+	public double[] testNeuralNetwork(DataSet testSet) {
 		if (isTrained) {
 			//System.out.println("testNeuralNetwork");
 			/*for(DataSetRow dataRow : testSet.getRows()) {
@@ -100,12 +100,12 @@ public class MultiLayerPerceptronNN {
 			DataSetRow dataRow = testSet.getRowAt(0);
 			nnet.setInput(dataRow.getInput());
 			nnet.calculate();
-			double[] networkOutput = nnet.getOutput();
-			double result = networkOutput[0]*GlobalConstants.MAXWIDTH;
-			//System.out.println(" Output: " + result);
+			double[] result = nnet.getOutput();
 			return result;
+			//System.out.println(" Output: " + result);
 		} else {
-			return -1;
+			double[] result = new double[GlobalConstants.NNOUTPUTNUM];
+			return result;
 		}
 	}
 }

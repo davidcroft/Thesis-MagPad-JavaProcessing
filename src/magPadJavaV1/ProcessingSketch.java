@@ -22,10 +22,9 @@ public class ProcessingSketch extends PApplet {
 
 	// Buffers
 	public Buffer magDataBuf;
-
-	// FirFilter
-	public FirFilter firFilterTLX, firFilterTLY, firFilterTLZ;
-	public FirFilter firFilterTRX, firFilterTRY, firFilterTRZ;
+	
+	// Fir filters group
+	public FIRFilterGroup filterGroup;
 
 	// Thread
 	public FFTThread fftThread;
@@ -33,8 +32,14 @@ public class ProcessingSketch extends PApplet {
 	// neural network
 	public MultiLayerPerceptronNN nnet;
 	private boolean isTrained = false;
-	public LocationRecognition locRecog;
+	private TrainingHashTable trainTable;
 	
+	// location prediction result
+	public LocationRecognition locRecogX;
+	public LocationRecognition locRecogY;
+	
+	// debug use: retrain model with training data set
+	public static DataSet train = new DataSet(GlobalConstants.NNINPUTNUM, GlobalConstants.NNOUTPUTNUM);
 
 	public void setup() {
 		// OSC
@@ -49,23 +54,32 @@ public class ProcessingSketch extends PApplet {
 		// MagBuffer
 		// init buffers
 		magDataBuf = new Buffer(GlobalConstants.BUFFERSIZE);
-		  
-		// FIR filter
-		firFilterTLX = new FirFilter("FirFilterTL.fcf");
-		firFilterTLY = new FirFilter("FirFilterTL.fcf");
-		firFilterTLZ = new FirFilter("FirFilterTL.fcf");
-		firFilterTRX = new FirFilter("FirFilterTR.fcf");
-		firFilterTRY = new FirFilter("FirFilterTR.fcf");
-		firFilterTRZ = new FirFilter("FirFilterTR.fcf");
+		
+		// init fir filters
+		filterGroup = new FIRFilterGroup();
 		
 		// neural network
-		nnet = new MultiLayerPerceptronNN("myModel.nnet", GlobalConstants.NNINPUTNUM, 18, GlobalConstants.NNOUTPUTNUM);
+		nnet = new MultiLayerPerceptronNN("myModel.nnet", GlobalConstants.NNINPUTNUM, 24, GlobalConstants.NNOUTPUTNUM);
 		isTrained = nnet.getIsTrained();
 		System.out.println("isTrained = "+(isTrained?"true":"false"));
 		System.out.println("create a new neural network");
 		
+		// debug use: retrain model
+		/*train = DataSet.load(Paths.get("files", "trainingSet").toAbsolutePath().toString());
+		System.out.println("trainSet size: " + train.size());
+		//train.saveAsTxt(Paths.get("files", "trainingSetTxt").toAbsolutePath().toString(), ",");
+		System.out.println("Train model 1");
+		nnet.trainModel(train);
+		System.out.println("NN model trained finished 1");
+		isTrained = true;*/
+		/////////////////////////////
+		
+		// init hashtable
+		trainTable = new TrainingHashTable();
+		
 		// location recognition
-		locRecog = new LocationRecognition(2);
+		locRecogX = new LocationRecognition(2);
+		locRecogY = new LocationRecognition(2);
 
 	    size(800,600);
 	}
@@ -96,28 +110,20 @@ public class ProcessingSketch extends PApplet {
 		//String tag = theOscMessage.get(0).stringValue();
 		//get x, y, z values as a float  
 		//System.out.println("receive osc message");
+		
 	    float[] bufX = new float[GlobalConstants.BUFFERSIZE];
 	    float[] bufY = new float[GlobalConstants.BUFFERSIZE];
 	    float[] bufZ = new float[GlobalConstants.BUFFERSIZE];
 	  
 	    for (int i = 0; i < GlobalConstants.BUFFERSIZE; i++) {
 		    /*bufX[i] = theOscMessage.get(i*3+0).floatValue();
-	    	  bufY[i] = theOscMessage.get(i*3+1).floatValue();
-	    	  bufZ[i] = theOscMessage.get(i*3+2).floatValue();*/
-	    
-		    float filterTL = (float)firFilterTLX.filter((double)theOscMessage.get(i*3+0).floatValue());
-		    float filterTR = (float)firFilterTRX.filter((double)theOscMessage.get(i*3+0).floatValue());
-		    bufX[i] = filterTL + (filterTR - filterTL)/2;
-	    
-		    filterTL = (float)firFilterTLY.filter((double)theOscMessage.get(i*3+1).floatValue());
-		    filterTR = (float)firFilterTRY.filter((double)theOscMessage.get(i*3+1).floatValue());
-		    bufY[i] = filterTL + (filterTR - filterTL)/2;
-	    
-		    filterTL = (float)firFilterTLZ.filter((double)theOscMessage.get(i*3+2).floatValue());
-		    filterTR = (float)firFilterTRZ.filter((double)theOscMessage.get(i*3+2).floatValue());
-		    bufZ[i] = filterTL + (filterTR - filterTL)/2;
+	    	bufY[i] = theOscMessage.get(i*3+1).floatValue();
+	    	bufZ[i] = theOscMessage.get(i*3+2).floatValue();*/
+	    	bufX[i] = filterGroup.applyToFilter(theOscMessage.get(i*3+0).floatValue(), 0);
+	    	bufY[i] = filterGroup.applyToFilter(theOscMessage.get(i*3+1).floatValue(), 1);
+	    	bufZ[i] = filterGroup.applyToFilter(theOscMessage.get(i*3+2).floatValue(), 2);
 	    }
-	  
+	    
 	    magDataBuf.addToBuffer(bufX, bufY, bufZ);
 	  
 	    // identify if model has been trained
@@ -128,7 +134,8 @@ public class ProcessingSketch extends PApplet {
 		    float[] dataY = magDataBuf.genBufferForFFT(magDataBuf.m_bufferIndex, 2);
 		    float[] dataZ = magDataBuf.genBufferForFFT(magDataBuf.m_bufferIndex, 3);
 		    // fftIndex: -1 testing, >=0 training (and fftIndex used for identify training index)
-		    bufferFFT(dataX, dataY, dataZ, -1);
+		    Pair<Double, Double> loc = Pair.createPair(-1.0, -1.0);
+		    bufferFFT(dataX, dataY, dataZ, loc);
 		    
 		    // predict
 		    if (!GlobalConstants.testingSet.isEmpty()) {
@@ -136,18 +143,25 @@ public class ProcessingSketch extends PApplet {
 		    	DataSet testSet = new DataSet(GlobalConstants.NNINPUTNUM, GlobalConstants.NNOUTPUTNUM);
 		    	testSet.addRow(testDataRow);
 		    	GlobalConstants.testingSet.removeRowAt(0);
-		    	double predictLoc = nnet.testNeuralNetwork(testSet);
+		    	double[] predictLoc = nnet.testNeuralNetwork(testSet);
+		    	
+		    	// normalize location
+		    	//predictLoc[0] = predictLoc[0] * GlobalConstants.MAXHEIGHT;
+		    	//predictLoc[1] = predictLoc[1] * GlobalConstants.MAXWIDTH;
+		    	System.out.println("predict location: " + predictLoc[0] + " " + predictLoc[1]);
+		    	
 		    	// send to locationRecognition
 		    	//System.out.println("new prediction");
-		    	if (locRecog.addToRecog(predictLoc)) {
+		    	if (locRecogX.addToRecog(predictLoc[0]) && locRecogY.addToRecog(predictLoc[1])) {
 		    		// robust location
-		    		double location = locRecog.getDetectLocation();
-		    		System.out.println("get a robust new location " + location);
+		    		double locX = locRecogX.getDetectLocation();
+		    		double locY = locRecogY.getDetectLocation();
+		    		System.out.println("get a robust new location: X-" + locX + " Y-" + locY);
 		    		
 		    		// send a OSC message
-		    		OscMessage myMessage = new OscMessage("/loc");
-		    		myMessage.add((float)location); 
-		    		oscP5.send(myMessage, remoteLocation); 
+		    		//OscMessage myMessage = new OscMessage("/loc");
+		    		//myMessage.add((float)location); 
+		    		//oscP5.send(myMessage, remoteLocation); 
 		    	}
 		    }
 	    } else {
@@ -158,7 +172,8 @@ public class ProcessingSketch extends PApplet {
 			    float[] dataX = magDataBuf.genBufferForFFT(magDataBuf.m_bufferIndex, 1);
 			    float[] dataY = magDataBuf.genBufferForFFT(magDataBuf.m_bufferIndex, 2);
 			    float[] dataZ = magDataBuf.genBufferForFFT(magDataBuf.m_bufferIndex, 3);
-			    bufferFFT(dataX, dataY, dataZ, fftIndex);
+			    Pair<Double, Double> loc = Pair.createPair(trainTable.get(fftIndex).getX(), trainTable.get(fftIndex).getY());
+			    bufferFFT(dataX, dataY, dataZ, loc);
 			    if (fftCnt++ >= GlobalConstants.FFTFOREACHPOS) {
 				    // stop fft
 				    startFFT = false;
@@ -169,12 +184,13 @@ public class ProcessingSketch extends PApplet {
 		    // train model in interrupt handler, might have some problem
 		    if (fftIndex > GlobalConstants.TRAININGPOSNUM) {
 		    	fftIndex = -1;
+		    	// save training set to local file
+		    	GlobalConstants.trainingSet.save(Paths.get("files", "trainingSet").toAbsolutePath().toString());
+		    	GlobalConstants.trainingSet.saveAsTxt(Paths.get("files", "trainingSetTxt").toAbsolutePath().toString(), " ");
 		    	// train model
 		    	System.out.println("train NN model...");
 		    	nnet.trainModel(GlobalConstants.trainingSet);
 		    	System.out.println("NN model trained finished");
-		    	// save training set to local file
-		    	GlobalConstants.trainingSet.save(Paths.get("files", "trainingSet").toAbsolutePath().toString());
 		    	// set isTrained and fftIndex
 		    	isTrained = true;
 		    	System.out.println("set isTrained to true");
@@ -182,8 +198,8 @@ public class ProcessingSketch extends PApplet {
  	    }
 	}
 
-	void bufferFFT(float[] fftDataX, float[] fftDataY, float[] fftDataZ, int index) {
-		fftThread = new FFTThread(this, 10, GlobalConstants.BUFFERSIZE * Buffer.BUFFERNUM, GlobalConstants.SAMPLERATE, fftDataX, fftDataY, fftDataZ, index);
+	void bufferFFT(float[] fftDataX, float[] fftDataY, float[] fftDataZ, Pair<Double, Double> location) {
+		fftThread = new FFTThread(this, 10, GlobalConstants.BUFFERSIZE * Buffer.BUFFERNUM, GlobalConstants.SAMPLERATE, fftDataX, fftDataY, fftDataZ, location);
 		fftThread.start();
 	}
 	

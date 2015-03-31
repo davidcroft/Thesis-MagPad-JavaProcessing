@@ -15,13 +15,16 @@ public class GlobalConstants {
 	public static final int FFTFOREACHPOS = 20;
 	
 	// Neural Network
-	public static final int TRAININGPOSNUM = 8;	// number of positions for training
-	public static final int NNINPUTNUM = 12;
-	public static final int NNOUTPUTNUM = 1;
+	public static final int TRAINTOTALROW = 15;
+	public static final int TRAINTOTALCOL = 9;
+	//public static final int TRAININGPOSNUM = 66;	// number of positions for training
+	public static final int TRAININGPOSNUM = TRAINTOTALROW*TRAINTOTALCOL;	// number of positions for training
+	public static final int NNINPUTNUM = 36;
+	public static final int NNOUTPUTNUM = 2;
 	public static DataSet trainingSet = new DataSet(NNINPUTNUM, NNOUTPUTNUM);
 	public static DataSet testingSet = new DataSet(NNINPUTNUM, NNOUTPUTNUM);
-	public static final int MAXWIDTH = 25;
-	public static final int MAXHEIGHT = 30;
+	public static final double MAXWIDTH = 7.9;			// width 7.9 inch
+	public static final double MAXHEIGHT = 9.4;  		// height 9.4 inch
 	
 	// Machine learning result recognition
 	// MINRECOGMEAN is used for lower bound for moving to a new location
